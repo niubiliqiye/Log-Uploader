@@ -1,0 +1,78 @@
+---
+description: 项目架构与模块组织规范
+alwaysApply: false
+globs:
+  - src/**/*
+---
+
+# 项目架构与模块组织规范
+
+> 目录权威结构见 `00-project-baseline.mdc`。本文件定义分层规则与依赖方向。
+
+## 1. 模块分层
+
+```
+基础层   common/、config/
+            ↓
+数据层   dto/
+            ↓
+核心层   core/  （services/、adapters/、guards/）
+            ↓
+接入层   http/、admin/、kafka/、grpc/
+            ↓
+聚合层   module/
+```
+
+## 2. 依赖方向（MUST — 严格单向）
+
+- 只允许**上层引用下层**，**MUST** 禁止反向依赖
+- `common/` 和 `config/` **MUST NOT** 引用任何其他 `src/` 目录
+- `dto/` 可引用 `common/`（如接口类型）
+- `core/` 可引用 `common/`、`config/`、`dto/`
+- 接入层（`http/`、`admin/`、`kafka/`、`grpc/`）可引用 `core/`、`common/`、`config/`、`dto/`
+- `module/` 可引用所有层
+- 接入层之间 **MUST NOT** 互相引用（`http/` 不得引用 `admin/`，反之亦然）
+
+## 3. 各目录职责
+
+| 目录 | 职责 | 状态 |
+| ---- | ---- | ---- |
+| `common/` | 跨模块共享的常量、接口定义、工具函数、异常过滤器、统一响应格式 | enforced |
+| `common/filters/` | 全局/模块级异常过滤器 | enforced |
+| `config/` | 模块配置选项的 TypeScript 类型定义 | enforced |
+| `dto/` | HTTP 上传请求体的 DTO 类（class-validator 校验） | enforced |
+| `core/` | 核心业务逻辑，与接入协议无关 | enforced |
+| `core/services/` | 核心业务 Service | enforced |
+| `core/adapters/` | 存储适配器接口定义与实现 | enforced |
+| `core/guards/` | 鉴权守卫 | enforced |
+| `http/controllers/` | HTTP REST 接入控制器 | enforced |
+| `admin/controllers/` | 管理端查询控制器 | enforced |
+| `admin/services/` | 管理端查询 Service | enforced |
+| `admin/dto/` | 管理端查询 DTO | enforced |
+| `kafka/consumers/` | Kafka 消费者 | enforced（骨架） |
+| `grpc/controllers/` | gRPC 控制器 | enforced（骨架） |
+| `module/` | 顶层聚合模块，组装所有子模块 | enforced |
+| `src/adapters/` | **deprecated** — 已迁移至 `core/adapters/`，待清理 | deprecated |
+| `src/guards/` | **deprecated** — 已迁移至 `core/guards/`，待清理 | deprecated |
+
+## 4. 新增文件放置规则
+
+| 要新增的类型 | 放置位置 |
+| ---- | ---- |
+| 上传相关 DTO | `dto/` |
+| 查询相关 DTO | `admin/dto/` |
+| 核心业务 Service | `core/services/` |
+| 接入层 Service（如查询） | 对应接入层（如 `admin/services/`） |
+| 存储适配器 | `core/adapters/`，**MUST** 实现 `StorageAdapter` 接口 |
+| Guard | `core/guards/` |
+| Filter | `common/filters/` |
+| 新接入协议 | 新建顶层目录（如 `websocket/`），内部结构参考 `http/` |
+
+**MUST NOT** 向 deprecated 目录（`src/adapters/`、`src/guards/`）添加任何新文件。
+
+## 5. 适配器模式
+
+- 存储扩展通过实现 `StorageAdapter` 接口（公开导出路径：`core/adapters/storage.adapter.ts`，底层定义在 `common/interfaces.ts`）
+- 接口方法：`save(log)` 和 `saveBatch(logs)`
+- 新适配器放入 `core/adapters/`，文件名格式：`xxx-storage.adapter.ts`
+- 通过 `LogUploaderModuleOptions.storage.adapter` 注入自定义适配器

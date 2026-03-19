@@ -1,0 +1,101 @@
+---
+description: 命名规范与 DTO 编写规范
+alwaysApply: false
+globs:
+  - src/**/*.ts
+---
+
+# 命名规范与 DTO 编写规范
+
+> 规则级别说明：**MUST** = 强制执行；**SHOULD** = 强烈建议，有合理理由时可偏离。
+
+## 1. 文件命名（MUST）
+
+- 统一使用 `kebab-case`（小写字母 + 短横线）
+- 文件名后缀体现类型：
+
+| 类型 | 后缀 | 示例 |
+| ---- | ---- | ---- |
+| Service | `.service.ts` | `log-uploader.service.ts` |
+| Controller | `.controller.ts` | `log-uploader.controller.ts` |
+| Module | `.module.ts` | `core.module.ts` |
+| DTO | `.dto.ts` | `upload-log.dto.ts` |
+| Guard | `.guard.ts` | `log-upload-auth.guard.ts` |
+| Filter | `.filter.ts` | `log-uploader-exception.filter.ts` |
+| Adapter | `.adapter.ts` | `file-storage.adapter.ts` |
+| 接口（集中） | `interfaces.ts` | `common/interfaces.ts`（多个共享接口集中维护时使用） |
+| 接口（独立） | 语义化文件名 | `storage.adapter.ts`（单一接口随所属模块放置，不强制 `.interfaces.ts` 后缀） |
+| 常量 | `.constants.ts` | `constants.ts` |
+| 工具函数 | `.utils.ts` | `utils.ts` |
+| 测试 | `.spec.ts` | `log-uploader.service.spec.ts` |
+
+## 2. 类与接口命名（MUST）
+
+- **PascalCase**，后缀对应文件类型
+- Service：`XxxService`（如 `LogUploaderService`）
+- Controller：`XxxController`（如 `LogUploaderController`）
+- Module：`XxxModule`（如 `CoreModule`）
+- DTO：`XxxDto`（如 `UploadLogDto`、`UploadLogBatchDto`）
+- Guard：`XxxGuard`（如 `LogUploadAuthGuard`）
+- Filter：`XxxFilter`（如 `LogUploaderExceptionFilter`）
+- Adapter：`XxxAdapter`（如 `FileStorageAdapter`）
+- Interface：不加 `I` 前缀（如 `StorageAdapter`、`NormalizedLog`）
+
+## 3. 变量与方法命名
+
+- **camelCase**：局部变量、方法名（如 `uploadBatch`、`normalizedLogs`） — **MUST**
+- **UPPER_SNAKE_CASE**：常量和注入 Token（如 `LOG_UPLOADER_OPTIONS`、`LOG_STORAGE_ADAPTER`） — **MUST**
+- 布尔变量 / 方法：SHOULD 使用 `is`、`has`、`enable` 等前缀（如 `enableBatch`）
+- 私有方法：无下划线前缀，使用 `private` 关键字即可 — **MUST**
+
+---
+
+## 4. DTO 编写规范
+
+> 以下规则仅适用于 `src/dto/` 和 `src/admin/dto/` 目录下的 DTO 文件。
+
+### 4.1 必填字段（MUST）
+
+```typescript
+@ApiProperty({
+  example: 'info',
+  enum: ['debug', 'info', 'warn', 'error'],
+})
+@IsIn(['debug', 'info', 'warn', 'error'])
+level!: LogLevel;
+```
+
+- 使用 `!:` 明确断言赋值
+- 必须有 `@ApiProperty` 装饰器
+
+### 4.2 可选字段（MUST）
+
+```typescript
+@ApiPropertyOptional({
+  example: 'event',
+  description: '日志类型，默认 frontend',
+})
+@IsOptional()
+@IsIn(['frontend', 'event', 'audit'])
+logType?: LogType;
+```
+
+- 使用 `?:` 标记可选
+- 必须有 `@IsOptional()` 装饰器
+- 使用 `@ApiPropertyOptional` 而非 `@ApiProperty({required: false})`
+
+### 4.3 装饰器顺序（MUST — 从上到下）
+
+1. **Swagger 装饰器**：`@ApiProperty` / `@ApiPropertyOptional`
+2. **可选标记**：`@IsOptional()`（仅可选字段）
+3. **类型校验**：`@IsString()`、`@IsIn()`、`@IsObject()`、`@IsISO8601()` 等
+4. **约束校验**：`@MaxLength()`、`@Min()`、`@Max()` 等
+
+### 4.4 其他约定
+
+- 字符串字段 SHOULD 加 `@MaxLength()` 限制，防止超长输入
+- 嵌套对象使用 `Record<string, unknown>` + `@IsObject()`
+  - **例外**：`Record<string, any>` 仅在确有动态 JSON 载荷的场景中允许，例如 DTO 字段（`@IsObject()` 与 `unknown` 不兼容）或接口中的日志扩展字段（`properties`、`extra`）。与 `code-style.mdc` 一致
+- DTO 类不继承、不实现接口，保持扁平 — **SHOULD**
+- 批量 DTO 使用包装类（如 `UploadLogBatchDto` 包含 `logs: UploadLogDto[]`） — **SHOULD**
+- `example` 值 SHOULD 贴近真实业务数据，方便 Swagger 调试

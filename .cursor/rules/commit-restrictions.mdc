@@ -5,6 +5,8 @@ alwaysApply: true
 
 # Commit 规范与限制
 
+> **触发条件**：仅在用户**明确要求提交**（commit）时才生成 commit message 或进入提交流程。不要在非提交场景中主动建议提交或进入提交语境。
+
 在生成或建议 commit 时，必须遵守以下规则。
 
 ## 1. Commit Message 格式

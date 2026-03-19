@@ -1,0 +1,74 @@
+---
+description: TypeScript / NestJS 代码风格规范
+alwaysApply: true
+---
+
+# TypeScript / NestJS 代码风格规范
+
+> 规则级别说明：**MUST** = 强制执行；**SHOULD** = 强烈建议，有合理理由时可偏离；**MAY** = 可选。
+
+## 1. 格式化
+
+> 当前仓库未配置 ESLint / Prettier。以下格式规则为人工约定，后续引入格式化工具后应以工具配置为准。
+
+| 规则 | 要求 | 级别 |
+| ---- | ---- | ---- |
+| 引号 | 单引号 `'` | MUST |
+| 缩进 | 2 空格，禁止 Tab | MUST |
+| 分号 | 语句末尾加分号 | MUST |
+| import 花括号 | 紧凑风格，无内部空格：`{Body, Controller}` | SHOULD |
+| 尾逗号 | 多行参数列表、对象、数组末尾加逗号 | SHOULD |
+| 行宽 | 120 字符以内 | SHOULD |
+| 空行 | 类方法之间保留一个空行；import 块与代码之间保留一个空行 | SHOULD |
+
+## 2. TypeScript 规则
+
+- `tsconfig.json` 保持 `strict: true` — **MUST** 禁止关闭
+- 优先使用 `interface` 定义对象结构；联合类型、交叉类型使用 `type` — **SHOULD**
+- 禁止使用裸 `any` — **MUST**
+  - 需要动态类型时优先使用 `Record<string, unknown>` 或 `unknown`
+  - **例外**：`Record<string, any>` 仅在确有动态 JSON 载荷的场景中允许使用，例如 DTO 字段（`@IsObject()` 与 `unknown` 不兼容）或接口中的日志扩展字段（`properties`、`extra` 等需要承载任意结构的数据）。其余场景 MUST 使用 `unknown`
+- 必选属性使用 `!:` 断言（DTO 场景）；可选属性使用 `?:` — **MUST**
+- 公共方法 SHOULD 显式标注返回类型；私有方法 MAY 省略
+
+## 3. NestJS 规范
+
+### 3.1 装饰器（MUST）
+
+- 类装饰器写在 `class` 关键字上方，每个装饰器独占一行
+- Controller 路由装饰器顺序：`@Get/@Post` → `@UseGuards` → `@ApiOperation` → `@ApiBearerAuth` → `@ApiBody` → `@ApiOkResponse`
+- 多个装饰器按「功能层 → 鉴权层 → 文档层」排列
+
+### 3.2 依赖注入（MUST）
+
+- 构造函数注入使用 `private readonly`
+- 自定义 token 注入使用 `@Inject(TOKEN_SYMBOL)` + `private readonly`
+- 禁止在 Service / Controller 中直接 `new` 其他 Service
+
+### 3.3 日志（MUST）
+
+- 使用 NestJS 内建 `Logger`
+- 声明方式：`private readonly logger = new Logger(ClassName.name);`
+- 禁止使用 `console.log` / `console.error`
+
+### 3.4 错误处理
+
+- 业务异常 MUST 使用 NestJS 内建异常类：`BadRequestException`、`UnauthorizedException`、`NotFoundException`、`InternalServerErrorException` 等
+- MUST NOT 裸 `throw new Error()`
+- 异常消息 SHOULD 使用英文，便于日志检索
+- 可预期的外部调用（IO、第三方）MUST 用 `try/catch` 并转换为对应的 NestJS 异常
+
+## 4. 注释规范
+
+- 只注释「为什么」，不注释「做了什么」—— 代码本身应自解释 — **MUST**
+- API 描述放在 `@ApiOperation`、`@ApiProperty` 等 Swagger 装饰器中，不额外写注释 — **MUST**
+- 复杂业务逻辑、非直觉的算法、临时 workaround SHOULD 注释说明原因
+- MUST NOT 保留被注释掉的代码块
+
+## 5. import 顺序（SHOULD）
+
+按以下分组排列，组间空一行：
+
+1. Node.js 内建模块（`fs`、`path` 等）
+2. 第三方包（`@nestjs/*`、`class-validator` 等）
+3. 项目内模块（相对路径 `../../common/*`）

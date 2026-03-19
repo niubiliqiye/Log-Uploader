@@ -1,0 +1,107 @@
+---
+description: 项目总则 — 最高优先级事实，其余规则引用本文件
+alwaysApply: true
+---
+
+# 项目总则
+
+> 本文件记录项目的核心事实与约束。所有其他规则文件以本文件为准，不得与之冲突。
+
+## 1. 项目定位
+
+- **名称**：log-uploader
+- **类型**：NestJS Library Module（npm 包），**不是**独立可运行的应用
+- **用途**：团队内部统一日志上传模块，供宿主 NestJS 项目引入
+
+## 2. 技术栈与工具
+
+| 项目 | 当前状态 |
+| ---- | ---- |
+| 语言 | TypeScript（`strict: true`） |
+| 框架 | NestJS 10.x / 11.x |
+| 构建 | `tsc -p tsconfig.json` |
+| 包管理器 | 未锁定（仓库无 lock 文件和 `packageManager` 字段），默认按已有命令执行即可 |
+| 校验 | class-validator + class-transformer |
+| 格式化工具 | 暂未配置（无 ESLint / Prettier） |
+| 测试框架 | 暂未引入（planned，见 ROADMAP alpha 阶段） |
+
+## 3. 可用脚本
+
+当前 `package.json` 中**仅有**以下脚本，不得假设其他脚本存在：
+
+```
+build   →  tsc -p tsconfig.json
+```
+
+尚无 `test`、`dev`、`start`、`lint` 等脚本。在这些脚本实际添加到 `package.json` 之前，规则和建议中不得引用它们。
+
+## 4. 公开导出
+
+所有对外公开的 API **MUST** 通过 `src/index.ts` 统一导出。新增公开类/接口/函数后，立即在 `src/index.ts` 中添加对应的 `export *`。
+
+## 5. 目录权威结构
+
+以下为当前 `src/` 的**唯一权威结构**，以 `src/index.ts` 的 export 路径为准：
+
+```
+src/
+├── index.ts                          # 统一导出入口
+├── common/                           # 基础层：常量、接口、工具、过滤器、响应
+│   ├── constants.ts
+│   ├── interfaces.ts
+│   ├── response.ts
+│   ├── utils.ts
+│   └── filters/
+│       └── log-uploader-exception.filter.ts
+├── config/                           # 配置层：模块选项类型
+│   └── log-uploader.options.ts
+├── dto/                              # 数据传输层：上传 DTO
+│   ├── upload-log.dto.ts
+│   └── upload-log-batch.dto.ts
+├── core/                             # 核心层：业务逻辑
+│   ├── core.module.ts
+│   ├── services/
+│   │   └── log-uploader.service.ts
+│   ├── adapters/
+│   │   ├── storage.adapter.ts
+│   │   └── file-storage.adapter.ts
+│   └── guards/
+│       └── log-upload-auth.guard.ts
+├── http/                             # 接入层（HTTP）
+│   ├── http.module.ts
+│   └── controllers/
+│       └── log-uploader.controller.ts
+├── admin/                            # 接入层（管理端）
+│   ├── admin.module.ts
+│   ├── controllers/
+│   │   └── log-uploader-admin.controller.ts
+│   ├── services/
+│   │   └── log-uploader-admin-query.service.ts
+│   └── dto/
+│       ├── query-recent-logs.dto.ts
+│       ├── query-logs-by-trace-id.dto.ts
+│       ├── search-logs.dto.ts
+│       ├── query-log-stats.dto.ts
+│       └── query-log-pagination.dto.ts
+├── kafka/                            # 接入层（Kafka，骨架）
+│   ├── kafka.module.ts
+│   └── consumers/
+│       └── log-uploader.consumer.ts
+├── grpc/                             # 接入层（gRPC，骨架）
+│   ├── grpc.module.ts
+│   └── controllers/
+│       └── log-uploader.grpc-controller.ts
+└── module/                           # 聚合层
+    └── log-uploader.module.ts
+```
+
+### 遗留目录（deprecated）
+
+以下目录为历史遗留，与 `core/` 下的同名目录功能重复，`src/index.ts` 未引用它们。**MUST** 禁止向这些目录添加新文件：
+
+- `src/adapters/` — 已迁移至 `src/core/adapters/`
+- `src/guards/` — 已迁移至 `src/core/guards/`
+
+## 6. Commit 触发规则
+
+仅在用户**明确要求提交**（commit）时才生成 commit message。不要在非提交场景中主动进入提交语境。

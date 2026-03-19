@@ -1,0 +1,109 @@
+---
+description: 测试规范（planned — 当前项目尚未引入测试框架）
+alwaysApply: false
+globs:
+  - src/**/*.spec.ts
+---
+
+# 测试规范
+
+> **Status: planned** — 当前项目尚未引入 Jest 及 `@nestjs/testing`，`package.json` 中无 `test` 脚本和测试依赖。以下为 ROADMAP alpha 阶段的预定义约定，在测试框架实际引入之前，不应默认生成测试命令或测试文件。
+
+## 1. 框架与工具（待引入）
+
+待 alpha 阶段启用时，需在 `package.json` 中补齐：
+
+- devDependencies：`jest`、`ts-jest`、`@nestjs/testing`、`@types/jest`
+- scripts：`test`、`test:watch`
+
+在上述依赖和脚本实际添加之前，本规则中涉及的命令和工具**均不可用**。
+
+## 2. 文件组织（SHOULD）
+
+- 测试文件 SHOULD 使用 `.spec.ts` 后缀
+- 测试文件 SHOULD 与被测文件**同目录**放置：
+
+```
+core/services/
+  log-uploader.service.ts
+  log-uploader.service.spec.ts
+```
+
+- 共享的测试辅助工具（mock factory 等）SHOULD 放入 `src/__test-utils__/`
+
+## 3. 测试结构（SHOULD）
+
+```typescript
+describe('LogUploaderService', () => {
+  let service: LogUploaderService;
+  let mockStorageAdapter: jest.Mocked<StorageAdapter>;
+
+  beforeEach(async () => {
+    // 构建测试模块、注入 mock
+  });
+
+  describe('upload', () => {
+    it('应正常保存合法日志', async () => { /* ... */ });
+    it('应拒绝不允许的日志级别', async () => { /* ... */ });
+  });
+});
+```
+
+- `describe` 外层 SHOULD 对应**类名或函数名**
+- `describe` 内层 SHOULD 对应**方法名**
+- `it` SHOULD 使用**中文**描述预期行为，以「应」开头
+
+## 4. Mock 规范（SHOULD）
+
+- 所有通过依赖注入的外部依赖 SHOULD mock（StorageAdapter、外部 Service 等）
+- 使用 `jest.fn()` 创建 mock 函数
+- 通过 `Test.createTestingModule` 的 providers 注入 mock：
+
+```typescript
+const module = await Test.createTestingModule({
+  providers: [
+    LogUploaderService,
+    {provide: LOG_UPLOADER_OPTIONS, useValue: mockOptions},
+    {provide: LOG_STORAGE_ADAPTER, useValue: mockStorageAdapter},
+  ],
+}).compile();
+```
+
+- mock 对象 SHOULD 在 `beforeEach` 中重置：`jest.clearAllMocks()`
+- 测试中 MUST NOT 访问真实文件系统、网络或数据库
+
+## 5. 导入策略
+
+根据测试类型使用不同的导入方式：
+
+| 测试类型 | 导入方式 | 说明 |
+| ---- | ---- | ---- |
+| 单元测试 | 直接导入被测文件（相对路径） | 测试内部实现细节，如 `import {LogUploaderService} from './log-uploader.service'` |
+| 集成 / API 测试 | 优先从 `src/index.ts` 导入 | 验证公开 API 的行为是否符合预期 |
+
+## 6. 断言规范（SHOULD）
+
+- 优先使用 Jest 内建断言：`expect(...).toBe()`、`toEqual()`、`toThrow()` 等
+- 异步操作使用 `await expect(...).rejects.toThrow()`
+- NestJS 异常断言需检查异常类型：
+
+```typescript
+await expect(service.upload(dto)).rejects.toThrow(BadRequestException);
+```
+
+## 7. 覆盖目标（SHOULD）
+
+| 层级 | 覆盖要求 |
+| ---- | ---- |
+| `core/services/` | 所有公共方法 100% 覆盖 |
+| `core/adapters/` | 关键路径覆盖（save、saveBatch） |
+| `http/controllers/` | 正常路径 + 异常路径覆盖 |
+| `admin/services/` | 所有查询方法覆盖 |
+| `common/utils.ts` | 工具函数 100% 覆盖 |
+| Guard / Filter | 核心分支覆盖 |
+
+## 8. 禁止事项（MUST NOT）
+
+- MUST NOT 在测试中使用 `console.log` 调试（使用 `jest.spyOn` 捕获日志输出）
+- MUST NOT 在测试之间共享可变状态
+- MUST NOT 将 `it.skip` 标记的失败测试提交到主分支
