@@ -220,9 +220,75 @@ interface LogUploaderModuleOptions {
 Authorization: Bearer your-log-token
 ```
 
+---
+
+## 七、Commit 提交规范
+
+项目已接入 `commitlint + husky + commitizen`。
+
+- 本地执行 `git commit` 时会自动校验提交信息
+- 执行 `pnpm commit` 可通过交互式表单生成规范提交信息
+
+推荐格式：
+
+```bash
+<type>(<scope>): <subject>
+```
+
+示例：
+
+```bash
+feat(http): support batch log upload
+fix(admin): correct traceId query condition
+docs: update installation guide
+chore: upgrade eslint config
+```
+
+当前允许的 `type`：
+
+```bash
+feat
+fix
+docs
+style
+refactor
+perf
+test
+build
+ci
+chore
+revert
+```
+
+推荐 `scope`：
+
+```bash
+core
+http
+admin
+kafka
+grpc
+module
+common
+config
+dto
+```
+
+首次拉取项目后，如需启用 Git Hooks：
+
+```bash
+pnpm install
+```
+
+交互式提交：
+
+```bash
+pnpm commit
+```
+
 ## 当未配置 authToken 时，接口不校验鉴权。
 
-## 七、HTTP 接口
+## 八、HTTP 接口
 
 ### 1. 健康检查
 
@@ -328,7 +394,7 @@ POST /internal/logs/batch
 
 ---
 
-## 八、Admin 查询接口
+## 九、Admin 查询接口
 
 > 当前仅支持 file storage
 
@@ -438,7 +504,7 @@ curl "http://localhost:3000/internal/logs/admin/stats?days=7" \
 
 ---
 
-## 九、Admin 分页返回格式
+## 十、Admin 分页返回格式
 
 recent / by-trace-id / search 返回统一分页结构：
 
@@ -470,7 +536,7 @@ curl "http://localhost:3000/internal/logs/admin/recent?limit=20&days=7&cursor=20
 
 ---
 
-## 十、自定义存储适配器
+## 十一、自定义存储适配器
 
 ```
 import { StorageAdapter, NormalizedLog } from '@your-org/nest-log-uploader';
@@ -500,7 +566,7 @@ LogUploaderCoreModule.forRoot({
 
 ---
 
-## 十一、Swagger 开启示例
+## 十二、Swagger 开启示例
 
 宿主项目 main.ts：
 
@@ -537,7 +603,7 @@ bootstrap();
 
 ---
 
-## 十二、统一返回格式
+## 十三、统一返回格式
 
 ### 1. 成功返回
 
@@ -563,7 +629,7 @@ bootstrap();
 
 ---
 
-## 十三、接口清单总表
+## 十四、接口清单总表
 
 ### 1. Http 接口
 
@@ -644,7 +710,7 @@ bootstrap();
 
 ---
 
-## 十四、推荐接入方式
+## 十五、推荐接入方式
 
 • 只要上传能力：LogUploaderModule
 • 要自定义上传入口：LogUploaderCoreModule
@@ -653,7 +719,7 @@ bootstrap();
 
 ---
 
-## 十五、已知限制
+## 十六、已知限制
 
 • Admin 查询当前仅支持 file storage
 • 当前 cursor 为轻量版，基于 timestamp
@@ -663,7 +729,7 @@ bootstrap();
 
 ---
 
-## 十六、后续规划
+## 十七、后续规划
 
 • 更严格的复合游标分页
 • 按 userId / deviceId / module 查询

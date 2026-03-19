@@ -10,14 +10,103 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "prepare": "husky",
+    "commitlint": "commitlint --from HEAD~1 --to HEAD --verbose",
+    "commit": "cz"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "cz-git": {
+    "useEmoji": false,
+    "allowCustomScopes": true,
+    "allowEmptyScopes": true,
+    "scopes": [
+      "core",
+      "http",
+      "admin",
+      "kafka",
+      "grpc",
+      "module",
+      "common",
+      "config",
+      "dto"
+    ],
+    "defaultBody": "",
+    "defaultIssues": "",
+    "messages": {
+      "type": "Select the type of change:",
+      "scope": "Optional scope. Select the affected module:",
+      "customScope": "Enter a custom scope:",
+      "subject": "Write a short, imperative summary:",
+      "body": "Optional longer description. Why is this change needed?",
+      "breaking": "List breaking changes (optional):",
+      "footerPrefixesSelect": "Select the footer prefix:",
+      "customFooterPrefix": "Enter a custom footer prefix:",
+      "footer": "List issues closed by this change (optional):",
+      "confirmCommit": "Confirm this commit?"
+    },
+    "types": [
+      {
+        "value": "feat",
+        "name": "feat: new feature"
+      },
+      {
+        "value": "fix",
+        "name": "fix: bug fix"
+      },
+      {
+        "value": "docs",
+        "name": "docs: documentation only"
+      },
+      {
+        "value": "style",
+        "name": "style: code style changes"
+      },
+      {
+        "value": "refactor",
+        "name": "refactor: code change without feature or fix"
+      },
+      {
+        "value": "perf",
+        "name": "perf: performance improvement"
+      },
+      {
+        "value": "test",
+        "name": "test: add or update tests"
+      },
+      {
+        "value": "build",
+        "name": "build: build system or dependencies"
+      },
+      {
+        "value": "ci",
+        "name": "ci: CI configuration"
+      },
+      {
+        "value": "chore",
+        "name": "chore: routine maintenance"
+      },
+      {
+        "value": "revert",
+        "name": "revert: revert previous commit"
+      }
+    ]
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@eslint/js": "^9.39.4",
     "@typescript-eslint/eslint-plugin": "^8.57.1",
     "@typescript-eslint/parser": "^8.57.1",
+    "commitizen": "^4.3.1",
+    "cz-git": "^1.12.0",
     "eslint": "^9.39.4",
-    "globals": "^16.5.0"
+    "globals": "^16.5.0",
+    "husky": "^9.1.7"
   },
   "peerDependencies": {
     "@nestjs/common": "^10.0.0 || ^11.0.0",
