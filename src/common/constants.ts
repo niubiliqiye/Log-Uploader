@@ -1,0 +1,2 @@
+export const LOG_UPLOADER_OPTIONS = Symbol('LOG_UPLOADER_OPTIONS');
+export const LOG_STORAGE_ADAPTER = Symbol('LOG_STORAGE_ADAPTER');

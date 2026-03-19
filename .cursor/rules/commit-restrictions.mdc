@@ -1,0 +1,71 @@
+---
+description: Git Commit 规范与限制
+alwaysApply: true
+---
+
+# Commit 规范与限制
+
+在生成或建议 commit 时，必须遵守以下规则。
+
+## 1. Commit Message 格式
+
+使用 [Conventional Commits](https://www.conventionalcommits.org/) 规范：
+
+```
+<type>(<scope>): <subject>
+
+[可选的 body]
+
+[可选的 footer]
+```
+
+### Type 类型（必填）
+
+| type       | 说明                   |
+| ---------- | ---------------------- |
+| `feat`     | 新功能                 |
+| `fix`      | Bug 修复               |
+| `docs`     | 文档变更               |
+| `style`    | 代码格式（不影响逻辑） |
+| `refactor` | 重构                   |
+| `perf`     | 性能优化               |
+| `test`     | 测试相关               |
+| `chore`    | 构建/工具/依赖等       |
+
+### 示例
+
+```
+feat(upload): 支持批量日志上传
+fix(auth): 修复 token 过期时的 401 处理
+docs: 更新 README 安装说明
+refactor(storage): 抽离 S3 适配器接口
+```
+
+## 2. 禁止提交的内容
+
+- **敏感信息**：密钥、密码、token、`.env` 中的真实配置
+- **构建产物**：`dist/`、`node_modules/`、`.idea/`
+- **调试文件**：`*.log`、`*.pem`、`npm-debug.log*`
+- **临时文件**：`*.tmp`、`*.swp`、`.DS_Store`
+
+## 3. Commit 粒度
+
+- **原子提交**：一个 commit 只做一件事，便于回滚和 code review
+- **避免大杂烩**：不要把无关修改混在同一 commit
+- **合理拆分**：格式化、重构、功能修改应分开提交
+
+## 4. Subject 书写规范
+
+- 使用祈使句，如「添加」「修复」「移除」
+- 首字母小写，句末不加句号
+- 长度建议 100 字符以内
+- 中文或英文均可，但中文为主，保持项目内一致
+
+## 5. 建议的 Pre-Commit 检查
+
+在建议 commit 前，提醒或确认：
+
+1. 是否包含敏感信息
+2. 是否误提交了 `.gitignore` 中的文件
+3. 是否做了无意义的空提交
+4. 是否将多个不相关改动拆分为独立 commit
