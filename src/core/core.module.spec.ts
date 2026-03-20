@@ -10,7 +10,10 @@ import {LogUploadAuthGuard} from './guards/log-upload-auth.guard';
 import {LogUploaderService} from './services/log-uploader.service';
 
 describe('LogUploaderCoreModule', () => {
-  const getProvider = (dynamicModule: ReturnType<typeof LogUploaderCoreModule.forRoot>, token: symbol | Function) =>
+  const getProvider = (
+    dynamicModule: ReturnType<typeof LogUploaderCoreModule.forRoot>,
+    token: symbol | (abstract new (...args: never[]) => unknown),
+  ) =>
     dynamicModule.providers?.find((provider) => typeof provider === 'object' && 'provide' in provider && provider.provide === token);
 
   it('forRoot wires defaulted options and the default file storage adapter', () => {

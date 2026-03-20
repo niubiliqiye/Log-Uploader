@@ -2,10 +2,10 @@
 
 NestJS 通用日志上传模块，适用于团队内部统一接入：
 
-当前仓库阶段：`0.1.0-alpha.5`
+当前仓库阶段：`0.1.0-alpha.6`
 
-- 已完成：Core、Http、Admin 的核心实现、自动化测试与宿主联调
-- 待推进：README 对齐、Alpha 最终收口
+- 已完成：Core、Http、Admin 的核心实现、自动化测试、宿主联调与 Alpha 收口
+- 当前结论：已完成 `alpha.1 ~ alpha.6`，可进入 Beta 准备
 
 - 前端异常日志
 - 埋点/事件日志
@@ -52,9 +52,10 @@ NestJS 通用日志上传模块，适用于团队内部统一接入：
 
 ## 当前验收状态
 
-- 当前建议标记版本：`v0.1.0-alpha.5`
-- 当前自动化测试结果：`15` 个 test suites、`71` 个 tests 全部通过
-- 当前阶段结论：已完成 `alpha.1 ~ alpha.5`，尚待收口 `alpha.6`
+- 当前建议标记版本：`v0.1.0-alpha.6`
+- 当前自动化测试结果：`pnpm lint`、`pnpm build`、`pnpm test --runInBand` 全部通过
+- 当前测试结果：`13` 个 test suites、`66` 个 tests 全部通过
+- 当前阶段结论：已完成 `alpha.1 ~ alpha.6`，可进入 Beta 准备
 
 ---
 
@@ -76,20 +77,24 @@ src/
 
 ## 二、安装
 
-```
+如果包已发布到内部 npm registry，可直接安装：
+
+```bash
 pnpm add log-uploader
 ```
 
+当前 Alpha 宿主联调以本仓库源码包接入为准；进入 Beta 前如需发布到 registry，需补充发布链路验证。
+
 宿主项目通常还需要：
 
-```
+```bash
 pnpm add class-validator class-transformer
 pnpm add @nestjs/swagger
 ```
 
 如需类型支持：
 
-```
+```bash
 pnpm add -D typescript @types/node @types/express
 ```
 
@@ -99,7 +104,7 @@ pnpm add -D typescript @types/node @types/express
 
 ### 1. 默认接入 Core + Http
 
-```
+```ts
 import { Module } from '@nestjs/common';
 import { LogUploaderModule } from 'log-uploader';
 
@@ -121,7 +126,7 @@ export class AppModule {}
 
 ### 2. 只接入 Core，不暴露默认上传接口
 
-```
+```ts
 import { Module } from '@nestjs/common';
 import { LogUploaderCoreModule } from 'log-uploader';
 
@@ -132,7 +137,7 @@ import { LogUploaderCoreModule } from 'log-uploader';
       storage: {
         type: 'file',
         baseDir: './storage/logs',
-        splitByLogType: true,// 是否启用按照logType分目录
+        splitByLogType: true,
       },
     }),
   ],
@@ -142,7 +147,7 @@ export class AppModule {}
 
 ### 3. 接入 Core + Http + Admin
 
-```
+```ts
 import { Module } from '@nestjs/common';
 import {
   LogUploaderModule,
@@ -171,7 +176,7 @@ export class AppModule {}
 
 ### 1. 配置接口
 
-```
+```ts
 interface LogUploaderModuleOptions {
   appName: string;
   authToken?: string;
@@ -183,6 +188,7 @@ interface LogUploaderModuleOptions {
     type: 'file' | 'custom';
     baseDir?: string;
     adapter?: StorageAdapter;
+    splitByLogType?: boolean;
   };
 }
 ```
@@ -196,8 +202,16 @@ interface LogUploaderModuleOptions {
 • redactFields：额外需要脱敏的字段
 • allowedLevels：允许接收的日志级别
 • storage.type：存储类型，当前支持 file / custom
-• storage.baseDir：本地日志目录
+• storage.baseDir：本地日志目录，默认 `./logs`
 • storage.adapter：自定义存储适配器实例
+• storage.splitByLogType：是否按 `logType` 分目录，默认 `false`
+
+默认值：
+• `enableBatch=true`
+• `maxBatchSize=200`
+• `storage.type=file`
+• `storage.baseDir=./logs`
+• `storage.splitByLogType=false`
 
 ---
 
@@ -225,7 +239,7 @@ interface LogUploaderModuleOptions {
 
 ## 六、鉴权方式
 
-当前默认使用：
+已配置 `authToken` 时默认使用：
 
 ```
 Authorization: Bearer your-log-token
@@ -297,7 +311,7 @@ pnpm install
 pnpm commit
 ```
 
-## 当未配置 authToken 时，接口不校验鉴权。
+未配置 `authToken` 时，HTTP 上传接口与 Admin 查询接口都不校验鉴权。
 
 ## 八、HTTP 接口
 
@@ -464,7 +478,12 @@ GET /internal/logs/admin/search
 
 • keyword
 • level
+• logType
 • traceId
+• eventName
+• sessionId
+• channel
+• platform
 • startTime
 • endTime
 • limit
@@ -479,6 +498,11 @@ GET /internal/logs/admin/search
 • traceId
 • userId
 • deviceId
+• eventName
+• sessionId
+• channel
+• platform
+• properties
 • extra
 
 #### 示例
@@ -499,11 +523,15 @@ GET /internal/logs/admin/stats
 #### 参数
 
 • days：默认 7，最大 30
+• logType：按日志类型过滤
+• eventName：按埋点事件名过滤
 
 #### 返回
 
 • total
 • byLevel
+• byLogType
+• byEventName
 • byDate
 
 #### 示例
@@ -692,7 +720,12 @@ bootstrap();
 | --------- | ------ | ---: | ----------------- |
 | keyword   | string |   否 | 关键词搜索        |
 | level     | string |   否 | 日志级别          |
+| logType   | string |   否 | frontend/event/audit |
 | traceId   | string |   否 | traceId 精确匹配  |
+| eventName | string |   否 | eventName 精确匹配 |
+| sessionId | string |   否 | sessionId 精确匹配 |
+| channel   | string |   否 | channel 精确匹配 |
+| platform  | string |   否 | platform 精确匹配 |
 | startTime | string |   否 | 开始时间          |
 | endTime   | string |   否 | 结束时间          |
 | limit     | number |   否 | 默认 50，最大 200 |
@@ -706,6 +739,8 @@ bootstrap();
 | 参数 | 类型   | 必填 | 说明            |
 | ---- | ------ | ---: | --------------- |
 | days | number |   否 | 默认 7，最大 30 |
+| logType | string | 否 | frontend/event/audit |
+| eventName | string | 否 | eventName 精确匹配 |
 
 ---
 
@@ -736,7 +771,7 @@ bootstrap();
 • 当前 cursor 为轻量版，基于 timestamp
 • 当多条日志拥有相同 timestamp 时，翻页理论上可能少量重复或漏数据
 • 当前 Admin 查询适合中小规模本地日志，不适合超大规模检索
-• 当前 Admin 接口调用为对使用者的权限进行校验
+• 当前仅支持基于 `authToken` 的接口鉴权，不包含更细粒度的权限体系
 
 ---
 
