@@ -2,10 +2,10 @@
 
 NestJS 通用日志上传模块，适用于团队内部统一接入：
 
-当前仓库阶段：`0.1.0-alpha.4`
+当前仓库阶段：`0.1.0-alpha.5`
 
-- 已完成：Core、Http、Admin 的核心实现与自动化测试
-- 待推进：最小宿主项目联调、Alpha 最终收口
+- 已完成：Core、Http、Admin 的核心实现、自动化测试与宿主联调
+- 待推进：README 对齐、Alpha 最终收口
 
 - 前端异常日志
 - 埋点/事件日志
@@ -52,9 +52,9 @@ NestJS 通用日志上传模块，适用于团队内部统一接入：
 
 ## 当前验收状态
 
-- 当前建议标记版本：`v0.1.0-alpha.4`
-- 当前自动化测试结果：`13` 个 test suites、`66` 个 tests 全部通过
-- 当前阶段结论：已完成 `alpha.1 ~ alpha.4`，尚未完成 `alpha.5 ~ alpha.6`
+- 当前建议标记版本：`v0.1.0-alpha.5`
+- 当前自动化测试结果：`15` 个 test suites、`71` 个 tests 全部通过
+- 当前阶段结论：已完成 `alpha.1 ~ alpha.5`，尚待收口 `alpha.6`
 
 ---
 
@@ -77,7 +77,7 @@ src/
 ## 二、安装
 
 ```
-pnpm add @your-org/nest-log-uploader
+pnpm add log-uploader
 ```
 
 宿主项目通常还需要：
@@ -101,7 +101,7 @@ pnpm add -D typescript @types/node @types/express
 
 ```
 import { Module } from '@nestjs/common';
-import { LogUploaderModule } from '@your-org/nest-log-uploader';
+import { LogUploaderModule } from 'log-uploader';
 
 @Module({
   imports: [
@@ -123,7 +123,7 @@ export class AppModule {}
 
 ```
 import { Module } from '@nestjs/common';
-import { LogUploaderCoreModule } from '@your-org/nest-log-uploader';
+import { LogUploaderCoreModule } from 'log-uploader';
 
 @Module({
   imports: [
@@ -147,7 +147,7 @@ import { Module } from '@nestjs/common';
 import {
   LogUploaderModule,
   LogUploaderAdminModule,
-} from '@your-org/nest-log-uploader';
+} from 'log-uploader';
 
 @Module({
   imports: [
@@ -550,7 +550,7 @@ curl "http://localhost:3000/internal/logs/admin/recent?limit=20&days=7&cursor=20
 ## 十一、自定义存储适配器
 
 ```
-import { StorageAdapter, NormalizedLog } from '@your-org/nest-log-uploader';
+import { StorageAdapter, NormalizedLog } from 'log-uploader';
 
 class CustomStorageAdapter implements StorageAdapter {
   async save(log: NormalizedLog): Promise<void> {
