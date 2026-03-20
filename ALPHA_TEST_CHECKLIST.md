@@ -21,10 +21,10 @@
 
 ## 当前状态（2026-03-20）
 
-- 当前仓库验收结论：建议标记为 `v0.1.0-alpha.4`
-- 自动化验证结果：`pnpm exec jest --runInBand` 通过，`13` 个 test suites、`66` 个 tests 全部通过
-- 当前已完成阶段：`alpha.1`、`alpha.2`、`alpha.3`、`alpha.4`
-- 当前未完成阶段：`alpha.5` 宿主联调、`alpha.6` 文档与发布收口
+- 当前仓库验收结论：建议标记为 `v0.1.0-alpha.5`
+- 自动化验证结果：`packages/log-uploader` `npm test -- --runInBand`、`apps/nestjs-backend` `npm run test:e2e`、`npm run test:e2e:http` 全部通过，合计 `15` 个 test suites、`71` 个 tests
+- 当前已完成阶段：`alpha.1`、`alpha.2`、`alpha.3`、`alpha.4`、`alpha.5`
+- 当前未完成阶段：`alpha.6` 文档与发布收口
 
 ## 2.1 `v0.1.0-alpha.1` Core 基线可用
 
@@ -198,24 +198,24 @@
 
 ### 最小宿主项目
 
-- [ ] 新建最小 NestJS demo 宿主项目
-- [ ] 宿主项目可引入 `LogUploaderModule`
-- [ ] 宿主项目可正常启动
-- [ ] 宿主项目能访问 `health`
-- [ ] 宿主项目能完成单条上传
-- [ ] 宿主项目能在 Admin 查询到刚写入的数据
+- [x] 新建最小 NestJS demo 宿主项目
+- [x] 宿主项目可引入 `LogUploaderModule`
+- [x] 宿主项目可正常启动
+- [x] 宿主项目能访问 `health`
+- [x] 宿主项目能完成单条上传
+- [x] 宿主项目能在 Admin 查询到刚写入的数据
 
 ### 典型接入模式
 
-- [ ] 验证 `LogUploaderModule` 一体化接入模式
-- [ ] 验证仅接 `LogUploaderCoreModule` 的模式
-- [ ] 验证仅接 `LogUploaderAdminModule` 的查询模式
+- [x] 验证 `LogUploaderModule` 一体化接入模式
+- [x] 验证仅接 `LogUploaderCoreModule` 的模式
+- [x] 验证仅接 `LogUploaderAdminModule` 的查询模式
 
 ### 宿主常见配置兼容性
 
-- [ ] 宿主启用 `ValidationPipe({ whitelist: true, transform: true })` 后行为正常
-- [ ] 宿主启用 Swagger 后接口可被扫描
-- [ ] 宿主已有全局异常过滤器时不影响核心功能
+- [x] 宿主启用 `ValidationPipe({ whitelist: true, transform: true })` 后行为正常
+- [x] 宿主启用 Swagger 后接口可被扫描
+- [x] 宿主已有全局异常过滤器时不影响核心功能
 
 ---
 
