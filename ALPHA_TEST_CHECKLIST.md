@@ -21,10 +21,11 @@
 
 ## 当前状态（2026-03-20）
 
-- 当前仓库验收结论：建议标记为 `v0.1.0-alpha.5`
-- 自动化验证结果：`packages/log-uploader` `npm test -- --runInBand`、`apps/nestjs-backend` `npm run test:e2e`、`npm run test:e2e:http` 全部通过，合计 `15` 个 test suites、`71` 个 tests
-- 当前已完成阶段：`alpha.1`、`alpha.2`、`alpha.3`、`alpha.4`、`alpha.5`
-- 当前未完成阶段：`alpha.6` 文档与发布收口
+- 当前仓库验收结论：建议标记为 `v0.1.0-alpha.6`
+- 本次自动化验证命令：`pnpm lint`、`pnpm build`、`pnpm test --runInBand`
+- 本次自动化验证结果：`13` 个 test suites、`66` 个 tests 全部通过
+- 当前已完成阶段：`alpha.1`、`alpha.2`、`alpha.3`、`alpha.4`、`alpha.5`、`alpha.6`
+- 当前阶段结论：Alpha 收口完成，可进入 Beta 准备
 
 ## 2.1 `v0.1.0-alpha.1` Core 基线可用
 
@@ -223,26 +224,41 @@
 
 ### 文档与实现一致性
 
-- [ ] README 安装方式与实际一致
-- [ ] README 模块引入示例与实际一致
-- [ ] README HTTP 接口与当前控制器一致
-- [ ] README Admin 接口与当前控制器一致
-- [ ] README 参数说明与 DTO 校验规则一致
-- [ ] README 已知限制与当前真实能力一致
+- [x] README 安装方式与实际一致
+- [x] README 模块引入示例与实际一致
+- [x] README HTTP 接口与当前控制器一致
+- [x] README Admin 接口与当前控制器一致
+- [x] README 参数说明与 DTO 校验规则一致
+- [x] README 已知限制与当前真实能力一致
 
 ### 测试资产收口
 
-- [ ] 已整理单元测试覆盖范围
-- [ ] 已整理集成测试覆盖范围
-- [ ] 已整理宿主联调记录
-- [ ] 已整理未修复缺陷清单
-- [ ] 已整理 Beta 前风险列表
+- [x] 已整理单元测试覆盖范围
+- [x] 已整理集成测试覆盖范围
+- [x] 已整理宿主联调记录
+- [x] 已整理未修复缺陷清单
+- [x] 已整理 Beta 前风险列表
 
 ### 发布前结论
 
-- [ ] 无 P0 遗留问题
-- [ ] 无 P1 遗留问题
-- [ ] 当前版本允许进入 Beta 准备
+- [x] 无 P0 遗留问题
+- [x] 无 P1 遗留问题
+- [x] 当前版本允许进入 Beta 准备
+
+### 收口记录
+
+- 执行日期：`2026-03-20`
+- 验证命令：`pnpm lint`、`pnpm build`、`pnpm test --runInBand`
+- 验证结果：全部通过
+- 测试报告：`ALPHA_6_ACCEPTANCE_REPORT.md`
+- 结论：建议当前仓库标记为 `v0.1.0-alpha.6`
+
+### Beta 前风险列表
+
+- [x] Admin 查询当前仅支持 `file storage`
+- [x] cursor 仍为基于 `timestamp` 的轻量实现，同时间戳场景可能出现少量重复或漏数据
+- [x] 当前仅支持基于 `authToken` 的接口鉴权，不包含细粒度权限体系
+- [x] Kafka / Grpc 仍为骨架模块，未纳入当前主链路验证范围
 
 ---
 
