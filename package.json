@@ -1,6 +1,6 @@
 {
   "name": "log-uploader",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.4",
   "description": "Common NestJS log uploader module for internal team usage",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

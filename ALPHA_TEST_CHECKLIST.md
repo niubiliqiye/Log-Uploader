@@ -19,40 +19,47 @@
 
 ## 2. Alpha Tag 对应执行清单
 
+## 当前状态（2026-03-20）
+
+- 当前仓库验收结论：建议标记为 `v0.1.0-alpha.4`
+- 自动化验证结果：`pnpm exec jest --runInBand` 通过，`13` 个 test suites、`66` 个 tests 全部通过
+- 当前已完成阶段：`alpha.1`、`alpha.2`、`alpha.3`、`alpha.4`
+- 当前未完成阶段：`alpha.5` 宿主联调、`alpha.6` 文档与发布收口
+
 ## 2.1 `v0.1.0-alpha.1` Core 基线可用
 
 ### 配置加载
 
-- [ ] `forRoot` 可正常启动模块
-- [ ] `forRootAsync` 可正常启动模块
-- [ ] 未显式传入 `enableBatch` 时默认值为 `true`
-- [ ] 未显式传入 `maxBatchSize` 时默认值为 `200`
-- [ ] 未显式传入 `storage.type` 时默认识别为 `file`
-- [ ] `allowedLevels` 自定义后可正确生效
+- [x] `forRoot` 可正常启动模块
+- [x] `forRootAsync` 可正常启动模块
+- [x] 未显式传入 `enableBatch` 时默认值为 `true`
+- [x] 未显式传入 `maxBatchSize` 时默认值为 `200`
+- [x] 未显式传入 `storage.type` 时默认识别为 `file`
+- [x] `allowedLevels` 自定义后可正确生效
 
 ### 单条写入
 
-- [ ] 传入最小合法日志时可成功写入
-- [ ] 未传 `logType` 时默认写为 `frontend`
-- [ ] 未传 `timestamp` 时自动补齐当前时间
-- [ ] `serverReceiveTime` 自动生成
-- [ ] `request` 存在时可写入 `ip`
-- [ ] `request` 存在时可写入 `ua`
+- [x] 传入最小合法日志时可成功写入
+- [x] 未传 `logType` 时默认写为 `frontend`
+- [x] 未传 `timestamp` 时自动补齐当前时间
+- [x] `serverReceiveTime` 自动生成
+- [x] `request` 存在时可写入 `ip`
+- [x] `request` 存在时可写入 `ua`
 
 ### 业务规则
 
-- [ ] `logType=event` 且提供 `eventName` 时写入成功
-- [ ] `logType=event` 且缺少 `eventName` 时返回 4xx
-- [ ] `level` 不在允许列表时返回 4xx
-- [ ] 自定义 `redactFields` 后敏感字段可正确脱敏
-- [ ] 默认敏感字段如 `token`、`password`、`authorization` 可被脱敏
+- [x] `logType=event` 且提供 `eventName` 时写入成功
+- [x] `logType=event` 且缺少 `eventName` 时返回 4xx
+- [x] `level` 不在允许列表时返回 4xx
+- [x] 自定义 `redactFields` 后敏感字段可正确脱敏
+- [x] 默认敏感字段如 `token`、`password`、`authorization` 可被脱敏
 
 ### 文件落盘
 
-- [ ] 按 `baseDir/appName/YYYY-MM-DD.log` 生成文件
-- [ ] 开启 `splitByLogType` 后按 `baseDir/appName/logType/YYYY-MM-DD.log` 生成文件
-- [ ] 单条写入采用 JSON Line 格式
-- [ ] 连续多次写入不会破坏文件结构
+- [x] 按 `baseDir/appName/YYYY-MM-DD.log` 生成文件
+- [x] 开启 `splitByLogType` 后按 `baseDir/appName/logType/YYYY-MM-DD.log` 生成文件
+- [x] 单条写入采用 JSON Line 格式
+- [x] 连续多次写入不会破坏文件结构
 
 ---
 
@@ -60,29 +67,29 @@
 
 ### 批量写入
 
-- [ ] `uploadBatch` 写入 1 条日志成功
-- [ ] `uploadBatch` 写入多条日志成功
-- [ ] `uploadBatch` 保持每条日志标准化结果正确
-- [ ] `enableBatch=false` 时批量上传返回 4xx
-- [ ] 批量数量超过 `maxBatchSize` 时返回 4xx
-- [ ] 批量中任意一条不合法时整体失败
+- [x] `uploadBatch` 写入 1 条日志成功
+- [x] `uploadBatch` 写入多条日志成功
+- [x] `uploadBatch` 保持每条日志标准化结果正确
+- [x] `enableBatch=false` 时批量上传返回 4xx
+- [x] 批量数量超过 `maxBatchSize` 时返回 4xx
+- [x] 批量中任意一条不合法时整体失败
 
 ### 自定义存储适配器
 
-- [ ] 可注入自定义 `StorageAdapter`
-- [ ] 自定义 `save` 被正确调用
-- [ ] 自定义 `saveBatch` 被正确调用
-- [ ] 适配器抛错时服务层返回 5xx
+- [x] 可注入自定义 `StorageAdapter`
+- [~] 自定义 `save` 被正确调用
+- [~] 自定义 `saveBatch` 被正确调用
+- [x] 适配器抛错时服务层返回 5xx
 
 ### 边界与稳定性
 
-- [ ] `UploadLogDto.message` 超长时校验失败
-- [ ] `traceId`、`module`、`page` 等超长时校验失败
-- [ ] `properties` 非对象时校验失败
-- [ ] `extra` 非对象时校验失败
-- [ ] 批量最小值 `logs.length=1` 可通过
-- [ ] 批量空数组时校验失败
-- [ ] 并发多次写入后文件内容仍可逐行解析
+- [x] `UploadLogDto.message` 超长时校验失败
+- [~] `traceId`、`module`、`page` 等超长时校验失败
+- [x] `properties` 非对象时校验失败
+- [x] `extra` 非对象时校验失败
+- [x] 批量最小值 `logs.length=1` 可通过
+- [x] 批量空数组时校验失败
+- [~] 并发多次写入后文件内容仍可逐行解析
 
 ---
 
@@ -90,38 +97,38 @@
 
 ### health / check
 
-- [ ] `GET /internal/logs/health` 无需鉴权可访问
-- [ ] `health` 返回 `status/appName/enableBatch/maxBatchSize/storageType/allowedLevels/timestamp`
-- [ ] 已配置 `authToken` 时，`GET /internal/logs/check` 携带正确 token 可访问
-- [ ] 已配置 `authToken` 时，`GET /internal/logs/check` 缺少 token 返回 401
-- [ ] 已配置 `authToken` 时，`GET /internal/logs/check` 错误 token 返回 401
-- [ ] 未配置 `authToken` 时，`GET /internal/logs/check` 可直接访问
+- [x] `GET /internal/logs/health` 无需鉴权可访问
+- [x] `health` 返回 `status/appName/enableBatch/maxBatchSize/storageType/allowedLevels/timestamp`
+- [~] 已配置 `authToken` 时，`GET /internal/logs/check` 携带正确 token 可访问
+- [~] 已配置 `authToken` 时，`GET /internal/logs/check` 缺少 token 返回 401
+- [~] 已配置 `authToken` 时，`GET /internal/logs/check` 错误 token 返回 401
+- [~] 未配置 `authToken` 时，`GET /internal/logs/check` 可直接访问
 
 ### 单条上传
 
-- [ ] `POST /internal/logs/upload` 最小合法请求成功
-- [ ] `POST /internal/logs/upload` 包含完整字段请求成功
-- [ ] 上传成功后文件中可看到对应日志
-- [ ] 上传成功返回统一成功结构
-- [ ] 非法 `level` 返回 4xx
-- [ ] 非法 `timestamp` 返回 4xx
-- [ ] `event` 缺少 `eventName` 返回 4xx
+- [x] `POST /internal/logs/upload` 最小合法请求成功
+- [~] `POST /internal/logs/upload` 包含完整字段请求成功
+- [~] 上传成功后文件中可看到对应日志
+- [x] 上传成功返回统一成功结构
+- [x] 非法 `level` 返回 4xx
+- [x] 非法 `timestamp` 返回 4xx
+- [x] `event` 缺少 `eventName` 返回 4xx
 
 ### 批量上传
 
-- [ ] `POST /internal/logs/batch` 传入 2 条合法日志成功
-- [ ] 批量成功返回 `count`
-- [ ] 批量写入后文件中可看到对应条数
-- [ ] `logs` 为空数组返回 4xx
-- [ ] `logs` 超过 200 条返回 4xx
-- [ ] 单条非法混入批次时整体返回 4xx
+- [x] `POST /internal/logs/batch` 传入 2 条合法日志成功
+- [x] 批量成功返回 `count`
+- [~] 批量写入后文件中可看到对应条数
+- [x] `logs` 为空数组返回 4xx
+- [x] `logs` 超过 200 条返回 4xx
+- [x] 单条非法混入批次时整体返回 4xx
 
 ### 统一异常返回
 
-- [ ] 业务校验失败返回统一异常结构
-- [ ] 鉴权失败返回统一异常结构
-- [ ] 内部存储异常返回统一异常结构
-- [ ] 异常返回中包含 `code/message/data/path/timestamp`
+- [x] 业务校验失败返回统一异常结构
+- [~] 鉴权失败返回统一异常结构
+- [x] 内部存储异常返回统一异常结构
+- [x] 异常返回中包含 `code/message/data/path/timestamp`
 
 ---
 
@@ -129,61 +136,61 @@
 
 ### recent
 
-- [ ] `GET /internal/logs/admin/recent` 可返回最近日志
-- [ ] `limit` 生效
-- [ ] `days` 生效
-- [ ] `level` 过滤生效
-- [ ] `cursor` 生效
-- [ ] 返回结果按时间倒序
-- [ ] 返回 `total/hasMore/nextCursor/items`
+- [x] `GET /internal/logs/admin/recent` 可返回最近日志
+- [x] `limit` 生效
+- [~] `days` 生效
+- [x] `level` 过滤生效
+- [x] `cursor` 生效
+- [x] 返回结果按时间倒序
+- [x] 返回 `total/hasMore/nextCursor/items`
 
 ### by-trace-id
 
-- [ ] `GET /internal/logs/admin/by-trace-id` 可返回指定 `traceId` 日志
-- [ ] 缺少 `traceId` 时返回 4xx
-- [ ] `traceId` 为空白字符串时返回 4xx
-- [ ] `limit`、`days`、`cursor` 生效
-- [ ] 结果中仅包含目标 `traceId`
+- [x] `GET /internal/logs/admin/by-trace-id` 可返回指定 `traceId` 日志
+- [~] 缺少 `traceId` 时返回 4xx
+- [x] `traceId` 为空白字符串时返回 4xx
+- [x] `limit`、`days`、`cursor` 生效
+- [x] 结果中仅包含目标 `traceId`
 
 ### search
 
-- [ ] `keyword` 搜索 `message` 命中
-- [ ] `keyword` 搜索 `module` 命中
-- [ ] `keyword` 搜索 `page` 命中
-- [ ] `keyword` 搜索 `traceId` 命中
-- [ ] `keyword` 搜索 `eventName` 命中
-- [ ] `keyword` 搜索 `properties` 命中
-- [ ] `keyword` 搜索 `extra` 命中
-- [ ] `level` 过滤生效
-- [ ] `logType` 过滤生效
-- [ ] `traceId` 过滤生效
-- [ ] `eventName` 过滤生效
-- [ ] `sessionId` 过滤生效
-- [ ] `channel` 过滤生效
-- [ ] `platform` 过滤生效
-- [ ] `startTime` 生效
-- [ ] `endTime` 生效
-- [ ] `startTime > endTime` 时返回 4xx
+- [x] `keyword` 搜索 `message` 命中
+- [~] `keyword` 搜索 `module` 命中
+- [~] `keyword` 搜索 `page` 命中
+- [~] `keyword` 搜索 `traceId` 命中
+- [~] `keyword` 搜索 `eventName` 命中
+- [x] `keyword` 搜索 `properties` 命中
+- [x] `keyword` 搜索 `extra` 命中
+- [x] `level` 过滤生效
+- [x] `logType` 过滤生效
+- [x] `traceId` 过滤生效
+- [x] `eventName` 过滤生效
+- [x] `sessionId` 过滤生效
+- [x] `channel` 过滤生效
+- [x] `platform` 过滤生效
+- [x] `startTime` 生效
+- [x] `endTime` 生效
+- [x] `startTime > endTime` 时返回 4xx
 
 ### stats
 
-- [ ] `GET /internal/logs/admin/stats` 可正常返回统计结果
-- [ ] 默认 `days=7`
-- [ ] `days` 上限校验生效
-- [ ] `logType` 过滤生效
-- [ ] `eventName` 过滤生效
-- [ ] 返回 `total`
-- [ ] 返回 `byLevel`
-- [ ] 返回 `byLogType`
-- [ ] 返回 `byEventName`
-- [ ] 返回 `byDate`
+- [x] `GET /internal/logs/admin/stats` 可正常返回统计结果
+- [x] 默认 `days=7`
+- [x] `days` 上限校验生效
+- [x] `logType` 过滤生效
+- [x] `eventName` 过滤生效
+- [x] 返回 `total`
+- [x] 返回 `byLevel`
+- [x] 返回 `byLogType`
+- [x] 返回 `byEventName`
+- [x] 返回 `byDate`
 
 ### 查询稳健性
 
-- [ ] 空目录下查询返回空结果而非 5xx
-- [ ] 存在坏数据行时查询过程可跳过坏行
-- [ ] 同一时间戳多条数据时 cursor 行为可接受
-- [ ] 查询接口在已配置 `authToken` 时必须鉴权
+- [~] 空目录下查询返回空结果而非 5xx
+- [x] 存在坏数据行时查询过程可跳过坏行
+- [~] 同一时间戳多条数据时 cursor 行为可接受
+- [~] 查询接口在已配置 `authToken` 时必须鉴权
 
 ---
 
@@ -287,4 +294,3 @@
 | 实际结果 | 实际发生什么 |
 | 是否阻塞下一 Tag | 是 / 否 |
 | 处理状态 | 待修复 / 已修复 / 延期 |
-

@@ -3,13 +3,18 @@
 ## 1. 项目概述
 
 - **项目名称**：log-uploader
-- **当前版本**：0.1.0
+- **当前版本**：0.1.0-alpha.4
 - **定位**：NestJS 通用日志上传模块，团队内部统一接入
 - **核心能力**：Core / Http / Admin / Kafka（骨架）/ Grpc（骨架）
 
 ---
 
 ## 2. 版本生命周期总览
+
+**当前里程碑**：`0.1.0-alpha.4`
+
+- 已完成：Core 基线、Core 测试闭环、HTTP 上传可用、Admin 查询可用
+- 待推进：`0.1.0-alpha.5` 宿主联调、`0.1.0-alpha.6` Alpha 收口
 
 ```mermaid
 flowchart LR
@@ -52,7 +57,7 @@ flowchart LR
 - Admin 测试：recent、by-trace-id、search、stats 查询逻辑
 - `package.json` 增加 `test`、`test:watch` 脚本
 
-**版本示例**：0.1.0-alpha.1（测试框架 + Core）、0.1.0-alpha.2（Http + Admin）
+**版本示例**：0.1.0-alpha.1（Core 基线）、0.1.0-alpha.2（Core 测试闭环）、0.1.0-alpha.3（Http 上传）、0.1.0-alpha.4（Admin 查询）
 
 **退出条件**：所有测试通过，CI 可跑通，内部无阻塞问题
 
